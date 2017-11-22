@@ -1,0 +1,8 @@
+LICENSE
+MANIFEST.in
+README.rst
+setup.py
+django_aws_zip.egg-info/PKG-INFO
+django_aws_zip.egg-info/SOURCES.txt
+django_aws_zip.egg-info/dependency_links.txt
+django_aws_zip.egg-info/top_level.txt
