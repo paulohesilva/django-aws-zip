@@ -9,8 +9,8 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
   name = 'django_aws_zip',
-  packages = ['django_aws_zip'],
-  version = '0.4',
+  packages = ['django_aws_zip','django_aws_zip/migrations'],
+  version = '0.5',
   description = 'A simple Django app to unzip on AWS S3.',
   author = 'Paulo Henrique da Silva',
   author_email = 'phs.paulohenriquesilva@gmail.com',
