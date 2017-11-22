@@ -11,7 +11,7 @@ Quick start
 
     INSTALLED_APPS = [
         ...
-        'django-aws-zip',
+        'django_aws_zip',
     ]
 
 2. Add AWS S3 credentials in your setings like this::
