@@ -23,3 +23,6 @@ Quick start
 
     AWS_STORAGE_BUCKET_NAME = 'YOUR_AWS_STORAGE_BUCKET_NAME'
 
+4. Apply migrate::
+
+    python manage.py migrate
