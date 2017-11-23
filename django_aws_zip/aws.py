@@ -12,7 +12,7 @@ class ZipThread(Thread):
     def __init__(self, key):
         Thread.__init__(self)
         # self.key = key
-        self.task = Task.objects.create(key=key)
+        self.task = Task.objects.get_or_create(key=key)
 
     def get_task_id(self):
         return self.task.id
