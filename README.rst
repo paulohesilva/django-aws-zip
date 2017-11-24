@@ -34,8 +34,9 @@ Quick start
 Code example
 -------------
 
-        from django_aws_zip.aws import Manager
-        manager = Manager()
-        manager.unzip('your/folder/on/aws')
+Example::
 
+    from django_aws_zip.aws import Manager
+    manager = Manager()
+    manager.unzip('your/folder/on/aws')
 
