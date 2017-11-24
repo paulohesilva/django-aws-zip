@@ -34,10 +34,8 @@ Quick start
 Code example
 -------------
 
-        from django_aws_zip.aws import ZipThread
-
-        key = 'your/folder/on/aws'
-        zip_thread = ZipThread(key)
-        zip_thread.start()
+        from django_aws_zip.aws import Manager
+        manager = Manager()
+        manager.unzip('your/folder/on/aws')
 
 
