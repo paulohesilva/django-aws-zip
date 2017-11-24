@@ -7,6 +7,17 @@ from django.conf import settings
 from .models import Task
 
 
+class Manager(object):
+
+    def unzip(self, key):
+        if not Task.objects.filter(key=key, status=0):
+            self.zip = ZipThread(key)
+            self.zip.start()
+            return self.zip.get_task_id()
+
+        return Task.objects.get(key=key, status=0).id
+
+
 class ZipThread(Thread):
 
     def __init__(self, key):
@@ -86,8 +97,12 @@ class S3Zip(object):
             k = bucket.new_key(key)
             if content is not None:
                 k.set_contents_from_filename(content)
+
+        except IsADirectoryError as e:
+            self.set_log(str(e))
+
         except Exception as e:
-            print(str(e))
+            self.set_log(str(e))
             self.task.status = 2
 
     def _download_s3_file(self, key):
@@ -113,3 +128,7 @@ class S3Zip(object):
         filename_arr = key.split('/')
         filename = filename_arr[len(filename_arr)-1]
         return filename
+
+    def set_log(self, log):
+        with open('unzip_file_log.dat', 'a') as file:
+            file.write(log + '\n')
