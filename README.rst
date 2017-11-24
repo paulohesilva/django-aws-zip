@@ -1,7 +1,7 @@
 =====
 Django AWS Zip
 =====
-
+.. image:: https://readthedocs.org/projects/django-aws-zip/badge/?version=latest
 django-aws-zip is a simple Django app to unzip files on AWS S3.
 
 Quick start
