@@ -9,7 +9,7 @@ from .models import Task
 
 class Manager(object):
 
-    def verify_key(self, key):
+    def unzip(self, key):
         if not Task.objects.filter(key=key, status=0):
             self.zip = ZipThread(key)
             self.zip.start()
