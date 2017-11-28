@@ -18,10 +18,14 @@ class Manager(object):
         return Task.objects.get(key=key, status=0).id
 
     def get_unzip_id(self, key):
-        return Task.objects.get(key=key, status=0).id
+        if Task.objects.filter(key=key, status=0):
+            return Task.objects.get(key=key, status=0).id
+        return
 
     def get_unzip_percent(self, key):
-        return Task.objects.get(key=key, status=0).percent
+        if Task.objects.filter(key=key, status=0):
+            return Task.objects.get(key=key, status=0).percent
+        return
 
 class ZipThread(Thread):
 
