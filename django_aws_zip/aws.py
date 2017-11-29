@@ -9,9 +9,9 @@ from .models import Task
 
 class Manager(object):
 
-    def unzip(self, key):
+    def unzip(self, key, destination=None):
         if not Task.objects.filter(key=key, status=0):
-            self.zip = ZipThread(key)
+            self.zip = ZipThread(key, destination)
             self.zip.start()
             return self.zip.get_task_id()
 
@@ -29,9 +29,10 @@ class Manager(object):
 
 class ZipThread(Thread):
 
-    def __init__(self, key):
+    def __init__(self, key, destination=None):
         Thread.__init__(self)
         # self.key = key
+        self.destination = destination
         self.task = Task.objects.create(key=key)
 
     def get_task_id(self):
@@ -39,17 +40,18 @@ class ZipThread(Thread):
 
     def run(self):
         print('Star job zip for key: '+self.task.key)
-        zip = S3Zip(self.task)
+        zip = S3Zip(self.task, self.destination)
         zip.unzip(self.task.key)
 
 
 class S3Zip(object):
 
-    def __init__(self, task=None):
+    def __init__(self, task=None, destination=None):
         self.KEY = getattr(settings, 'AWS_S3_ACCESS_KEY_ID', None)
         self.SECRET = getattr(settings, 'AWS_S3_SECRET_ACCESS_KEY', None)
         self.BUCKET = getattr(settings, 'AWS_STORAGE_BUCKET_NAME', None)
         self.task = task
+        self.destination = destination
         if not self.KEY or not self.SECRET or not self.BUCKET:
             raise Exception
 
@@ -63,7 +65,10 @@ class S3Zip(object):
         filename = self._get_filename_by_key(key)
         self._unzip_local(filename)
         print('Creating structure and setting       70%......')
-        self._send(key, filename)
+        if self.destination:
+            self._send(self.destination, filename)
+        else:
+            self._send(key, filename)
         print('Remove temporary files               80%.......')
         self._remove_tmp('tmp/'+filename)
         self._remove_tmp(filename)
