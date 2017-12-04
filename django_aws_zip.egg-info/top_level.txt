@@ -1,0 +1,2 @@
+django_aws_zip
+django_aws_zip/migrations
