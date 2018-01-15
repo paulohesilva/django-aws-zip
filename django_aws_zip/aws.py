@@ -3,6 +3,8 @@ import zipfile
 import os
 import shutil
 from threading import Thread
+
+import unicodedata
 from django.conf import settings
 from .models import Task
 
@@ -118,6 +120,7 @@ class S3Zip(object):
         except Exception as e:
             self.set_log(str(e))
             self.task.status = 2
+            self.task.save()
 
     def _download_s3_file(self, key):
         s3 = boto.connect_s3(self.KEY, self.SECRET)
@@ -128,9 +131,14 @@ class S3Zip(object):
             filename = self._get_filename_by_key(s3_path)
             k.get_contents_to_filename(filename)
         except (OSError) as e:
-            print(str(e))
+            self.set_log(str(e))
             self.task.status = 2
+            self.task.save()
             return False
+        except Exception as e:
+            self.set_log(str(e))
+            self.task.status=2
+            self.task.save()
 
     def _remove_tmp(self, path):
         if os.path.isfile(path):
@@ -141,7 +149,7 @@ class S3Zip(object):
     def _get_filename_by_key(self, key):
         filename_arr = key.split('/')
         filename = filename_arr[len(filename_arr)-1]
-        return filename
+        return unicodedata.normalize('NFKD', filename).encode('ASCII', 'ignore').decode('ASCII')
 
     def set_log(self, log):
         with open('unzip_file_log.dat', 'a') as file:
