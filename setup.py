@@ -1,5 +1,6 @@
 import os
-from distutils.core import setup
+# from distutils.core import setup
+from setuptools import find_packages, setup
 
 with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as readme:
     README = readme.read()
@@ -15,6 +16,7 @@ setup(
   author = 'Paulo Henrique da Silva',
   author_email = 'phs.paulohenriquesilva@gmail.com',
   url = 'https://github.com/paulohesilva/django_aws_zip.git', # use the URL to the github repo
-  keywords = ['aws', 's3', 'zip'], # arbitrary keywords
-  classifiers = [],
+  keywords=['aws', 's3', 'zip'], # arbitrary keywords
+  classifiers=[],
+  install_requires=['boto'],
 )
