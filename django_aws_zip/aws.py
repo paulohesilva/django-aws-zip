@@ -8,6 +8,7 @@ import unicodedata
 from django.conf import settings
 from .models import Task
 
+import hashlib
 
 class Manager(object):
 
@@ -65,6 +66,7 @@ class S3Zip(object):
         self._download_s3_file(key)
         print('Unpacking                            10%....')
         filename = self._get_filename_by_key(key)
+        print('Unziping Local       15%......')
         self._unzip_local(filename)
         print('Creating structure and setting       70%......')
         if self.destination:
@@ -72,14 +74,13 @@ class S3Zip(object):
         else:
             self._send(key, filename)
         print('Remove temporary files               80%.......')
-        self._remove_tmp('tmp/'+filename)
+        self._remove_tmp('tmp/'+self.file_hash(filename))
         self._remove_tmp(filename)
         print('Finish                               100%...........')
 
-
     def _unzip_local(self, path_to_zip_file):
         zip_ref = zipfile.ZipFile(path_to_zip_file, 'r')
-        zip_ref.extractall('tmp/'+zip_ref.filename+'/')
+        zip_ref.extractall('tmp/'+self.file_hash(path_to_zip_file)+'/')
         zip_ref.close()
         return zip_ref.filename
 
@@ -154,3 +155,8 @@ class S3Zip(object):
     def set_log(self, log):
         with open('unzip_file_log.dat', 'a') as file:
             file.write(log + '\n')
+
+    def file_hash(self, filename):
+        m = hashlib.md5()
+        m.update(filename.encode('utf-8'))
+        return m.hexdigest()
