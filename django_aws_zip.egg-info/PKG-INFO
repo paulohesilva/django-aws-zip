@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: django-aws-zip
-Version: 1.0.1
+Version: 1.0.2
 Summary: A simple Django app to unzip on AWS S3.
 Home-page: https://github.com/paulohesilva/django_aws_zip.git
 Author: Paulo Henrique da Silva
