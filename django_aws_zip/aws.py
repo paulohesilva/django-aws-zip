@@ -66,23 +66,31 @@ class S3Zip(object):
         self._download_s3_file(key)
         print('Unpacking                            10%....')
         filename = self._get_filename_by_key(key)
-        print('Unziping Local       15%......')
-        self._unzip_local(filename)
         print('Creating structure and setting       70%......')
         if self.destination:
             self._send(self.destination, filename)
         else:
             self._send(key, filename)
         print('Remove temporary files               80%.......')
-        self._remove_tmp('tmp/'+self.file_hash(filename))
+        self._remove_tmp('tmp/'+filename)
         self._remove_tmp(filename)
         print('Finish                               100%...........')
 
     def _unzip_local(self, path_to_zip_file):
         zip_ref = zipfile.ZipFile(path_to_zip_file, 'r')
-        zip_ref.extractall('tmp/'+self.file_hash(path_to_zip_file)+'/')
-        zip_ref.close()
-        return zip_ref.filename
+        file_list = []
+        for fileinfo in zip_ref.infolist():
+            try:
+                zip_ref.extract(fileinfo, 'tmp/'+path_to_zip_file)
+            except UnicodeEncodeError as e:
+                self.set_log(str(e))
+                fileinfo.filename = unicodedata.normalize('NFKD', fileinfo.filename).encode('ASCII', 'ignore').decode(
+                    'ASCII')
+                zip_ref.extract(fileinfo, 'tmp/'+path_to_zip_file)
+
+            file_list.append(fileinfo.filename)
+
+        return file_list
 
     def _get_file_list(self, path):
         zfobj = zipfile.ZipFile(path)
@@ -91,19 +99,18 @@ class S3Zip(object):
         return self.name_list
 
     def _send(self, keypath, path):
-        filename = self._unzip_local(path)
-        unz_stricture = self._get_file_list(path)
+        file_name = self._unzip_local(path)
+        self.total_items = len(file_name)
         current_file = 0
-        for key, values in unz_stricture.items():
-            for val in values:
-                self._create_content(keypath+'/' + val, 'tmp/' + filename+ '/' + val)
-                current_file = (current_file + 1)
-                # print(str(current_file) + ' of ' + str(self.total_items))
-                print('Progress:' + str((100 *(int(current_file)/int(self.total_items))))+'%')
+        for val in file_name:
+            self._create_content(keypath+'/' + val, 'tmp/' + path + '/' + val)
+            current_file = (current_file + 1)
+            # print(str(current_file) + ' of ' + str(self.total_items))
+            print('Progress:' + str((100 *(int(current_file)/int(self.total_items))))+'%')
 
-                if self.task is not None:
-                    self.task.percent = (100 *(int(current_file)/int(self.total_items)))
-                    self.task.save()
+            if self.task is not None:
+                self.task.percent = (100 *(int(current_file)/int(self.total_items)))
+                self.task.save()
         self.task.status = 1
         self.task.save()
 
